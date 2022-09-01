@@ -1,0 +1,18 @@
+---
+title: "Adamic BIOL 7263 Webpage"
+author: "Emily Adamic"
+date: "9/1/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r Notes to myself, include=FALSE}
+# This is the index, the base. 
+
+# I can link to hmtl files via url links in Rmd... 
+```
+
+[Assignment1](Assignments/Adamic_Assignment1.html)
