@@ -1,8 +1,13 @@
 ---
-title: "Adamic BIOL 7263 Webpage"
+title: "Adamic BIOL 7263 Home Webpage"
 author: "Emily Adamic"
 date: "9/1/2022"
-output: html_document
+output: 
+  rmarkdown::html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    theme: sandstone
 ---
 
 ```{r setup, include=FALSE}
@@ -13,6 +18,61 @@ knitr::opts_chunk$set(echo = TRUE)
 # This is the index, the base. 
 
 # I can link to hmtl files via url links in Rmd... 
+
 ```
 
-[Assignment1](Assignments/Adamic_Assignment1.html)
+# Introduction
+
+____
+
+### Educational Experience
+
+Degree       Major                Year    School                                                   Location
+------------ -------------------- ------- -------------------------------------------------------  --------------
+B.S.Ed       Exercise Science     2016    ![](MemphisLogo.png){width=7%} *University of Memphis*   Memphis, TN
+M.S.         Exercise Physiology  2020    ![](IndianaLogo.png){width=6%} *Indiana University*      Bloomington, IN
+Ph.D.        Biological Sciences  TBD     ![](TulsaLogo.png){width=7%}   *University of Tulsa*     Tulsa, OK
+
+
+### Research Interests
+
+> How does the brain use internal signals to regulate the body?
+
+> How do these signals interact with intrinsic brain activity for conscious feelings?
+
+I address these questions in my PhD research, working under Dr. Sahib Khalsa at the Laureate Institute for Brain Research. For a broader view of our lab, see Dr. Khalsa's lab website found [here](https://www.laureateinstitute.org/sahib-khalsa.html).
+
+Internal signals regarding the state of the body constantly emanate to the central nervous system (CNS). The CNS must then integrate these signals across disparate receptors and body systems, and issue the proper motor commands to help these signals stay within homeostatic ranges. This regulation can also occur prospectively as the brain learns new contexts, predicts future needs, and regulates the body preemptively. While these internal body signals are to inform this regulation, these signals also contribute to subjective feeling states and the constant stream of consciousness which are cores of the human experience. These conscious sensations of the body, if maladaptive, play an important role in many symptoms of psychiatric disorders such as anxiety and depression. Understanding how the body talks to the brain, and how the brain regulates the body, is thus important for physical and mental health and performance. 
+
+![*Figure 1. Identifying what subregions of the insular cortex receive bottom-up signals that are then accessible to top-down attention towards and conscoius awareness of the body, in both healthy comparisons (HC) and a sample of anxieyt, depression, and eating disorder patients (ADE).*](Fig2.jpg){width=40%}
+
+
+
+
+
+# Assignments 
+___
+
+Date         Description   Link   
+------------ ------------- ------------- 
+09/01/22     Hello world   [click here](Assignments/Adamic_Assignment1.html)
+
+
+
+
+
+
+
+
+  
+      
+
+
+
+
+
+
+
+
+
+
