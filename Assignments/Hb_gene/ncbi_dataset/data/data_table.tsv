@@ -1,0 +1,2 @@
+gene_id	gene_symbol	description	scientific_name	common_name	tax_id	genomic_range	orientation	location	gene_type	transcript_accession	transcript_name	transcript_length	transcript_cds_coords	protein_accession	isoform_name	protein_length	protein_name
+3039	HBA1	hemoglobin subunit alpha 1	Homo sapiens	human	9606	NC_000016.10:176680-177522;NC_060940.1:170722-171564	+;+	chr 16	PROTEIN_CODING	NM_000558.5		577	NM_000558.5:38-466	NP_000549.1		142	hemoglobin subunit alpha

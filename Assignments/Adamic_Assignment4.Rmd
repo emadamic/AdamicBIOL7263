@@ -1,0 +1,113 @@
+---
+title: "Assignment 4"
+author: "Emily Adamic"
+date: "9/29/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+```
+
+All the steps are outlined here, but [here's a link](Scripts/Adamic_Assignment4_Script.R) to the script that will run everything at once. 
+
+```{r load libraries and data, echo=FALSE}
+
+df = read.csv("Data/MBT_ebird.csv")
+```
+
+
+----- - 
+
+**In which year did I observe the most individual birds? How many?**
+
+```{r}
+
+yearly.df = df %>%
+  #mutate(year = as.character(year)) %>% 
+  group_by(year) %>% 
+  summarise(yearly_total = sum(count), .groups="drop") %>%
+  mutate(year = as.numeric(year)) %>% 
+  arrange(desc(yearly_total)) 
+
+# max_bird_year = yearly.df$year[1] # if you arrange 
+
+max_bird_year =  yearly.df$year [ which(yearly.df$yearly_total == max(yearly.df$yearly_total)) ]  # if you don't arrange
+
+cat("You observed the most individual birds in", max_bird_year )
+
+```
+
+
+
+**In that year how many different species of birds did I observe?**
+
+```{r}
+
+cat("You observed", length(  unique( filter(df, year == max_bird_year)$scientific_name ) ), "species of bird in", max_bird_year  )
+
+```
+
+
+
+**In which state did I most frequently observe Red-winged Blackbirds?**
+
+```{r}
+
+b.bird = df %>% filter( common_name == "Red-winged Blackbird" ) %>% 
+  mutate(state = substr(location, 4,5)) %>% 
+  ungroup() %>% 
+  group_by(state) %>% 
+  summarise(Count = sum(count), .groups="drop") %>%
+  arrange( desc(Count) ) 
+
+# many other states than just these ones, but did not observe R-w Bbirds here so they get filtered out. 
+
+cat("You observed the most Red-winged blackbird most frequently in", b.bird$state[1], ", with", b.bird$Count[1], "total birds.")
+```
+
+----
+
+**Filter observations for a duration between 5 and 200 minutes. Calculate the mean rate per checklist that I encounter species each year. Specifically, calculate the number of species in each checklist divided by duration and then take the mean for the year.**
+
+```{r}
+
+df %>% filter(duration >= 5, duration <= 200) %>% 
+  group_by(list_ID, year) %>%
+  summarise(num_of_unique = length(common_name), .groups="drop") %>%  # number of species in each checklist 
+  group_by(year) %>%
+  summarise(num_of_lists = length(unique(list_ID)),
+            Mean_species = mean(num_of_unique), .groups="drop") %>%  # mean for each year
+  arrange(year) 
+  
+```
+
+
+
+----
+
+
+**Create a tibble that includes the complete observations for the top 10 most frequently observed species. First generate a top 10 list and then use this list to filter all observations. Export this tibble as a .csv file saved to a folder called “Results” folder within your R project and add link to the markdown document.**
+
+```{r}
+# generate a list of top ten most observed (i.e. highest count)
+tops_df = df %>% group_by(common_name) %>% 
+  summarise(num_observed = sum(count), .groups="drop") %>%  # summarise across all lists/states/etc. 
+  arrange( desc(num_observed) )
+
+topten_list = tops_df$common_name[1:10]
+
+topten_df = df %>% filter(common_name %in% topten_list)
+knitr::kable(head(topten_df), "simple")
+
+write.csv(topten_df, "Results/top_ten_species.csv")
+
+```
+
+
+
+
+
+

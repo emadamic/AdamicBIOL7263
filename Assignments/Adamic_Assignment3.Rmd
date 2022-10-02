@@ -1,0 +1,242 @@
+---
+title: "Assignment 3"
+author: "Emily Adamic"
+date: "9/15/2022"
+output: 
+  rmarkdown::html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+For these problems, use your plain text editor (e.g. Notepad++). Paste the test into a new document and use the search function to write a regular expression that gives the desired result. Submit your assignment as the html output of an Rmarkdown document linked in your class portfolio. In that document, provide the regular expression that works (there may be several possible “right” answers) as plain text markdown page followed by an explanation of what each element the expression is doing. If you get stuck, give the solution that gets you as close as you can.
+
+
+### 1. "Our preferred format for data is a csv file. Use regular expressions to convert this table I copied form a pdf into a csv format" 
+
+**Original:**
+
+```
+Candidate Choice    Absentee Mail   Early Voting    Election Day    Total Votes
+TODD RUSS   7,021   8,194   135,216   150,431
+CLARK JOLLEY    7,012   5,835   107,714   120,561
+```
+
+**Steps:**
+
+  - ```Find \, and replace with nothing```: This will find all commas (those between numbers), and removes them
+
+  - ```Find \s{2,} and replace with comma space ", "```: This finds two or more consecutive spaces, and replaces with one comma followed by a space, as is necessary for a csv. 
+
+
+**Result:**
+
+```
+Candidate Choice, Absentee Mail, Early Voting, Election Day, Total Votes
+TODD RUSS, 7021, 8194, 135216, 150431
+CLARK JOLLEY, 7012, 5835, 107714, 120561
+```
+
+
+### 2. Reformat our class roster. 
+
+**Original:** 
+
+```
+Adamic, Emily M.    ema3896@utulsa.edu
+Bierbaum, Emily L.  elb0588@utulsa.edu
+Cartmell, Laci J.   ljc454@utulsa.edu
+Delaporte, Elise    eld0070@utulsa.edu
+Hansen, Rebekah E.  reh9623@utulsa.edu
+Herrboldt, Madison A.   mah1626@utulsa.edu
+Lewis, Cari D.  cdl5261@utulsa.edu
+Mierow, Tanner T.   ttm5619@utulsa.edu
+Naranjo, Daniel S.  dsn8679@utulsa.edu
+Paslay, Caleb   cap1050@utulsa.edu
+Pletcher, Olivia M. omp9336@utulsa.edu
+West, Amy C.    acw1471@utulsa.edu
+```
+
+**Steps** 
+
+  1. ```Find \s\w.\s and replace with three spaces```: This will find the middle initial ("space / single letter / period / space") and remove it, replacing with three spaces to uniquely separate names and emails. 
+
+  2. ```Find ,  and replace with a space```: This will find the commas, and replace with a space; now we have "word word word" which will be easier to capture and reorder. 
+
+  3. ```Find @utulsa.edu replace with nothing```: This will remove the @tulsa, which makes the three parts more uniform. 
+
+  4. ```Find (\w+)\s+(\w+)\s+(\w+), replace with \2 \1 \(\3@utulsa.edu\)```: This will "capture" each word (w+, one or more word characters that are separated by \s+, one of more spaces) and "store" them, to be replaced in their desired order separated by one space, while also adding back in the @utulsa.edu.
+  
+  *Note*: Step 4 does not work on Atom, the text editor I have been using on my Mac. Atom does not allow for capturing and re-ordering using the "\\1", it just literally prints "\\1". 
+
+**Result:**
+
+```
+Emily Adamic (ema3896@utulsa.edu)
+Emily Bierbaum (elb0588@utulsa.edu)
+Laci Cartmell (ljc454@utulsa.edu)
+Elise Delaporte (eld0070@utulsa.edu)
+Rebekah Hansen (reh9623@utulsa.edu)
+Madison Herrboldt (mah1626@utulsa.edu)
+Cari Lewis (cdl5261@utulsa.edu)
+Tanner Mierow (ttm5619@utulsa.edu)
+Daniel Naranjo (dsn8679@utulsa.edu)
+Caleb Paslay (cap1050@utulsa.edu)
+Olivia Pletcher (omp9336@utulsa.edu)
+Amy West (acw1471@utulsa.edu)
+```
+
+### 3. Use regular expressions to drop the genus name
+
+**Original:**
+
+```
+Banded sculpin, Cottus carolinae, 5
+Redspot chub, Nocomis asper, 5
+Northern hog sucker, Hypentelium nigricans, 6
+Creek chub, Semotilus atromaculatus, 8
+Stippled darter, Etheostoma punctulatum, 9
+Smallmouth bass, Micropterus dolomieu, 10
+Logperch, Percina caprodes, 13
+Slender madtom, Noturus exilis, 14
+```
+
+**Steps:** 
+
+  1. ```Find ,\s\w+\s\w+, and replace with ,```: this finds the comma before the genus, space, one or more word charaters (first word in the genus), another space, one or more word characters (second word in the genus), and the comma following the genus, effectively isolated the genus, removing it, and replacing with just a comma. 
+
+**Result:**
+
+```
+Banded sculpin, 5
+Redspot chub, 5
+Northern hog sucker, 6
+Creek chub, 8
+Stippled darter, 9
+Smallmouth bass, 10
+Logperch, 13
+Slender madtom, 14
+```
+
+### 4. With the original data set, use regular expression to modify the names
+
+**Steps:**
+
+  1. ```Find ,\s(\d+) and replace with five spaces and then \1```: This gets rid of the comma preceding the number at the end, and replaces with five spaces which are unique. Now, the commas are only around the first word of the genus, which we want to modify. 
+  
+  2. ```Find ,\s(\w)\w+\s and replace with , \1_```: this finds a space (and captures first letter) followed by one or more word characters and a space, effectively the first word of the genus. It replaces with the first letter and underscore as desired. 
+  
+  3. ```Fix the five spaces: find \s{5} and replace with , space ```: This fixes the five spaces, replacing with the desired comma space. 
+  
+**Result:**
+
+```
+Banded sculpin, C_carolinae, 5
+Redspot chub, N_asper, 5
+Northern hog sucker, H_nigricans, 6
+Creek chub, S_atromaculatus, 8
+Stippled darter, E_punctulatum, 9
+Smallmouth bass, M_dolomieu, 10
+Logperch, P_caprodes, 13
+Slender madtom, N_exilis, 14
+```
+
+### 5. Starting with the original data set abbreviate the genus species
+
+**Steps:**
+
+  1. ```Same step 1 as the preceding question```
+  
+  2. ```Find ,\s(\w)\w+\s(\w{3})\w+ and replace with , \1_\2.,```: This will capture the first letter of the first word, and the first three letters of the second word, and replace with the first captured element_second captured element followed by a period, as desired. 
+  
+  3. ```Same step 3 as preceding question, clean up the five spaces and replace with single space```
+
+
+**Result**
+
+```
+Banded sculpin, C_car., 5
+Redspot chub, N_asp., 5
+Northern hog sucker, H_nig., 6
+Creek chub, S_atr., 8
+Stippled darter, E_pun., 9
+Smallmouth bass, M_dol., 10
+Logperch, P_cap., 13
+Slender madtom, N_exi., 14
+```
+
+
+### 6. Create a new file that contains only the fasta headers
+
+I have downloaded the *homo sapiens* hemoglobin subunit alpha 1 from the NIH website, unzipped it, and saved the fasta file as "Hb_gene.fna" in the Data folder of my assignments directory.  
+
+To create a file that contains only the headers (lines that begin with >)
+
+```
+grep ">" Data/Hb_gene.fna > Hb_gene_headers.txt
+
+cat Hb_gene_headers.txt
+>NC_000016.10:176680-177522 HBA1 [organism=Homo sapiens] [GeneID=3039] [chromosome=16]
+>NC_060940.1:170722-171564 HBA1 [organism=Homo sapiens] [GeneID=3039] [chromosome=16]
+```
+
+### 7. Create a new file that contains the full sequences of only the ribosomal transcripts or proteins. 
+
+I don't think we have ribosomal proteins in our gene for Hemoglobin? We will use the gene name "HBA1" as an example of how to pull out the full sequences, calling genes by their name. 
+
+First we use a sed command to add a new line in between full genes, and we | pipe | that output to another sed command that will find the "HB
+```
+sed 's/>/ \n>/g' Hb_gene.fna
+```
+
+Then we pull out the gene name, 
+
+sed 's/>/ \n>/g' GCF_015476345.1_ZJU1.0_rna.fna | sed -n '/BCO2/,/^ /p' > BCO2.txt
+
+
+```{r}
+library(tidyverse)
+# pivot_longer and pivot_wider 
+
+relig_income %>% 
+  pivot_longer(cols = c("<$10k", "$10-20k", "$20-30k", "$30-40k", "$40-50k", "$50-75k", "$75-100k", "$100-150k", ">150k", "Don't know/refused"), names_to = "income", values_to = "count")
+
+bill = billboard
+
+arrange(billboard, by=wk1)
+
+family <- tribble(
+  ~family,  ~dob_child1,  ~dob_child2, ~gender_child1, ~gender_child2,
+       1L, "1998-11-26", "2000-01-29",             1L,             2L,
+       2L, "1996-06-22",           NA,             2L,             NA,
+       3L, "2002-07-11", "2004-04-05",             2L,             2L,
+       4L, "2004-10-10", "2009-08-27",             1L,             1L,
+       5L, "2000-12-05", "2005-02-28",             2L,             1L,
+)
+
+family <- family %>% mutate_at(vars(starts_with("dob")), parse_date)
+
+
+family %>% 
+  pivot_longer(
+    col = !family, #pivot columns that are not family
+    names_to = c(".value", "child"), #transform column names to two variables. The special name ".value" tells pivot_longer() that that part of the column name specifies the “value” being measured (which will become a variable in the output) 
+    names_sep = "_", #This tells pivot_longer() to split the column names at the "_". 
+    values_drop_na = TRUE
+  )
+```
+
+
+
+
+
+
+
+
+
+
+
