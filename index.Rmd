@@ -53,9 +53,12 @@ Internal signals regarding the state of the body constantly emanate to the centr
 # Assignments 
 ___
 
-Date         Description   Link   
------------- ------------- ------------- 
-09/01/22     Hello world   [click here](Assignments/Adamic_Assignment1.html)
+Date            Description      Link   
+-------------   -------------    ------------- 
+09/01/22        Hello world      [Assignment 1](Assignments/Adamic_Assignment1.html)
+TBD (Assn 3)    Text editing     TBD
+10-02-22        Wrangling        [Assignment 4](Assignments/Adamic_Assignment4.html)
+10-02-22        Tidying          [Assignment 5](Assignments/Adamic_Assignment5.html)
 
 
 
