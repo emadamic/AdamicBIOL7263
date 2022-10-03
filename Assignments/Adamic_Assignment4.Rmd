@@ -2,11 +2,13 @@
 title: "Assignment 4"
 author: "Emily Adamic"
 date: "9/29/2022"
-output: html_document
+output: 
+  rmarkdown::html_document:
+    code_folding: show
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 ```
@@ -102,7 +104,7 @@ topten_list = tops_df$common_name[1:10]
 topten_df = df %>% filter(common_name %in% topten_list)
 knitr::kable(head(topten_df), "simple")
 
-write.csv(topten_df, "Results/top_ten_species.csv")
+# write.csv(topten_df, "Results/top_ten_species.csv")
 
 ```
 

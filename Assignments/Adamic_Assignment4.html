@@ -195,6 +195,83 @@ window.buildTabsets = function(tocID) {
 };
 
 </script>
+<script>
+window.initializeCodeFolding = function(show) {
+
+  // handlers for show-all and hide all
+  $("#rmd-show-all-code").click(function() {
+    $('div.r-code-collapse').each(function() {
+      $(this).collapse('show');
+    });
+  });
+  $("#rmd-hide-all-code").click(function() {
+    $('div.r-code-collapse').each(function() {
+      $(this).collapse('hide');
+    });
+  });
+
+  // index for unique code element ids
+  var currentIndex = 1;
+
+  // select all R code blocks
+  var rCodeBlocks = $('pre.r, pre.python, pre.bash, pre.sql, pre.cpp, pre.stan, pre.julia, pre.foldable');
+  rCodeBlocks.each(function() {
+    // skip if the block has fold-none class
+    if ($(this).hasClass('fold-none')) return;
+
+    // create a collapsable div to wrap the code in
+    var div = $('<div class="collapse r-code-collapse"></div>');
+    var showThis = (show || $(this).hasClass('fold-show')) && !$(this).hasClass('fold-hide');
+    var id = 'rcode-643E0F36' + currentIndex++;
+    div.attr('id', id);
+    $(this).before(div);
+    $(this).detach().appendTo(div);
+
+    // add a show code button right above
+    var showCodeText = $('<span>' + (showThis ? 'Hide' : 'Code') + '</span>');
+    var showCodeButton = $('<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm code-folding-btn pull-right float-right"></button>');
+    showCodeButton.append(showCodeText);
+    showCodeButton
+        .attr('data-toggle', 'collapse')
+        .attr('data-bs-toggle', 'collapse') // BS5
+        .attr('data-target', '#' + id)
+        .attr('data-bs-target', '#' + id)   // BS5
+        .attr('aria-expanded', showThis)
+        .attr('aria-controls', id);
+
+    var buttonRow = $('<div class="row"></div>');
+    var buttonCol = $('<div class="col-md-12"></div>');
+
+    buttonCol.append(showCodeButton);
+    buttonRow.append(buttonCol);
+
+    div.before(buttonRow);
+
+    // show the div if necessary
+    if (showThis) div.collapse('show');
+
+    // update state of button on show/hide
+    //   * Change text
+    //   * add a class for intermediate states styling
+    div.on('hide.bs.collapse', function () {
+      showCodeText.text('Code');
+      showCodeButton.addClass('btn-collapsing');
+    });
+    div.on('hidden.bs.collapse', function () {
+      showCodeButton.removeClass('btn-collapsing');
+    });
+    div.on('show.bs.collapse', function () {
+      showCodeText.text('Hide');
+      showCodeButton.addClass('btn-expanding');
+    });
+    div.on('shown.bs.collapse', function () {
+      showCodeButton.removeClass('btn-expanding');
+    });
+
+  });
+
+}
+</script>
 <style type="text/css">.hljs-literal {
 color: #990073;
 }
@@ -331,6 +408,9 @@ pre code {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -347,6 +427,14 @@ pre code {
 
 <div id="header">
 
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 <h1 class="title toc-ignore">Assignment 4</h1>
@@ -359,13 +447,43 @@ pre code {
 <p>All the steps are outlined here, but <a href="Scripts/Adamic_Assignment4_Script.R">here’s a link</a> to the script that will run everything at once.</p>
 <hr />
 <p><strong>In which year did I observe the most individual birds? How many?</strong></p>
+<pre class="r"><code>yearly.df = df %&gt;%
+  #mutate(year = as.character(year)) %&gt;% 
+  group_by(year) %&gt;% 
+  summarise(yearly_total = sum(count), .groups=&quot;drop&quot;) %&gt;%
+  mutate(year = as.numeric(year)) %&gt;% 
+  arrange(desc(yearly_total)) 
+
+# max_bird_year = yearly.df$year[1] # if you arrange 
+
+max_bird_year =  yearly.df$year [ which(yearly.df$yearly_total == max(yearly.df$yearly_total)) ]  # if you don&#39;t arrange
+
+cat(&quot;You observed the most individual birds in&quot;, max_bird_year )</code></pre>
 <pre><code>## You observed the most individual birds in 2014</code></pre>
 <p><strong>In that year how many different species of birds did I observe?</strong></p>
+<pre class="r"><code>cat(&quot;You observed&quot;, length(  unique( filter(df, year == max_bird_year)$scientific_name ) ), &quot;species of bird in&quot;, max_bird_year  )</code></pre>
 <pre><code>## You observed 210 species of bird in 2014</code></pre>
 <p><strong>In which state did I most frequently observe Red-winged Blackbirds?</strong></p>
+<pre class="r"><code>b.bird = df %&gt;% filter( common_name == &quot;Red-winged Blackbird&quot; ) %&gt;% 
+  mutate(state = substr(location, 4,5)) %&gt;% 
+  ungroup() %&gt;% 
+  group_by(state) %&gt;% 
+  summarise(Count = sum(count), .groups=&quot;drop&quot;) %&gt;%
+  arrange( desc(Count) ) 
+
+# many other states than just these ones, but did not observe R-w Bbirds here so they get filtered out. 
+
+cat(&quot;You observed the most Red-winged blackbird most frequently in&quot;, b.bird$state[1], &quot;, with&quot;, b.bird$Count[1], &quot;total birds.&quot;)</code></pre>
 <pre><code>## You observed the most Red-winged blackbird most frequently in MO , with 596 total birds.</code></pre>
 <hr />
 <p><strong>Filter observations for a duration between 5 and 200 minutes. Calculate the mean rate per checklist that I encounter species each year. Specifically, calculate the number of species in each checklist divided by duration and then take the mean for the year.</strong></p>
+<pre class="r"><code>df %&gt;% filter(duration &gt;= 5, duration &lt;= 200) %&gt;% 
+  group_by(list_ID, year) %&gt;%
+  summarise(num_of_unique = length(common_name), .groups=&quot;drop&quot;) %&gt;%  # number of species in each checklist 
+  group_by(year) %&gt;%
+  summarise(num_of_lists = length(unique(list_ID)),
+            Mean_species = mean(num_of_unique), .groups=&quot;drop&quot;) %&gt;%  # mean for each year
+  arrange(year) </code></pre>
 <pre><code>## # A tibble: 13 x 3
 ##     year num_of_lists Mean_species
 ##    &lt;int&gt;        &lt;int&gt;        &lt;dbl&gt;
@@ -384,6 +502,15 @@ pre code {
 ## 13  2022           14        13.6</code></pre>
 <hr />
 <p><strong>Create a tibble that includes the complete observations for the top 10 most frequently observed species. First generate a top 10 list and then use this list to filter all observations. Export this tibble as a .csv file saved to a folder called “Results” folder within your R project and add link to the markdown document.</strong></p>
+<pre class="r"><code># generate a list of top ten most observed (i.e. highest count)
+tops_df = df %&gt;% group_by(common_name) %&gt;% 
+  summarise(num_observed = sum(count), .groups=&quot;drop&quot;) %&gt;%  # summarise across all lists/states/etc. 
+  arrange( desc(num_observed) )
+
+topten_list = tops_df$common_name[1:10]
+
+topten_df = df %&gt;% filter(common_name %in% topten_list)
+knitr::kable(head(topten_df), &quot;simple&quot;)</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -502,6 +629,7 @@ pre code {
 </tr>
 </tbody>
 </table>
+<pre class="r"><code># write.csv(topten_df, &quot;Results/top_ten_species.csv&quot;)</code></pre>
 
 
 
@@ -536,6 +664,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

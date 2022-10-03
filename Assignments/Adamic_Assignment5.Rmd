@@ -2,9 +2,97 @@
 title: "Adamic Assignment 5"
 author: "Emily Adamic"
 date: "10/2/2022"
-output: html_document
+output: 
+  rmarkdown::html_document:
+    code_folding: show
+    theme: sandstone
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+```{r libraries, include=FALSE }
+library(RCurl)
+library(tidyverse)
+```
+
+```{r load data}
+# download data from github 
+x = RCurl::getURL("https://raw.githubusercontent.com/mbtoomey/Biol_7263/main/Data/assignment6part1.csv")
+df1 = read.csv(text=x)
+
+x = RCurl::getURL("https://raw.githubusercontent.com/mbtoomey/Biol_7263/main/Data/assignment6part2.csv")
+df2 = read.csv(text=x)
+```
+
+## Links
+
+[R script](Scripts/Adamic_Assignment5_Script.R)
+
+[Tidy tibble csv](Results/tidy_tibble.csv)
+
+[Group residual mass csv](Results/residual_mass_group.csv)
+
+
+## Code 
+
+Pivot and merge these two data sets into a single tidy tibble. Export this tibble as a .csv file saved to a folder called “Results” folder within your R project.
+```{r}
+# wants cols for samplenum, group (trt vs. control), then "variable": sex, mass, body length, age... "value" 
+
+# Can split up this by _'s 
+df1.clean = df1 %>% pivot_longer(cols = Sample1_Male_Control:Sample20_Female_Treatment,
+                                 names_to = c("sample_name", "sex", "group"), 
+                                 names_sep = "_") 
+df1.sex = df1.clean %>% dplyr::select(sample_name, sex) %>% unique()
+df1.clean = df1.clean %>% dplyr::select(-sex)
+# df1.tobind = df1.clean %>% dplyr::select(sample_name, value = gender) %>% 
+#   mutate(ID = "gender")
+# df1.clean = df1.clean %>% dplyr::select(sample_name, group, ID, value) # get rid of gender and reorder cols for viewing pleasure 
+# df1.clean = bind_rows(df1.clean, df1.tobind)
+
+# names(df2) = gsub("\\.", "_", names(df2)) # replace periods with underscores so it's easer to sep
+
+
+df2.clean = df2 %>% pivot_longer( cols = Sample16.Treatment:Sample13.Control, 
+                              names_to = c("sample_name", "group"), 
+                              names_sep = "\\.") 
+
+df.clean = bind_rows(df1.clean, df2.clean) # bind the first and second together 
+df.clean = left_join(df.clean, df1.sex) # add sex information to df clean 
+
+# write.csv(df.clean, "Results/tidy_tibble.csv")
+
+
+```
+
+
+With this tidy tibble, generate a new tibble of the mean +/- standard deviation of the residual mass (mass/body length) by treatment and sex. Export this tibble as a .csv file saved to a folder called “Results” folder within your R project.
+```{r}
+# Calculate mass/body length for everyone 
+df.clean.wide = df.clean %>% filter(ID != "age") %>% 
+  pivot_wider(names_from = ID, values_from=value) %>%
+  na.omit() %>%  # missing some mass values... 
+  mutate(residual_mass = mass/body_length)
+
+# group by and summarise the mean of this mass/body length 
+df.clean.wide.group = df.clean.wide %>% group_by(group, sex) %>% 
+  summarise(Mean = mean(residual_mass, na.rm=T), 
+            SD = sd(residual_mass, na.rm=T))
+  
+
+write.csv(df.clean.wide.group, "Results/residual_mass_group.csv")
+```
+
+
+In an Rmarkdown document present the code you used to pivot, merge, etc. and the links to the commented R script and final .csv files stored in your Data folder. Knit this to an html file and link on your portfolio page.
+
+
+
+
+
+
+
+
+
