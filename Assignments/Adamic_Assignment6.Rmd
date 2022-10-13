@@ -1,0 +1,116 @@
+---
+title: "Assignment 6"
+author: "Emily Adamic"
+date: "10/13/22"
+output: 
+  rmarkdown::html_document:
+    code_folding: hide
+    toc: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load libraries, echo=FALSE, include=FALSE}
+library(tidyverse)
+library(viridis)
+library(patchwork)
+```
+
+
+# Question 1 
+
+```{r question one, fig.width=10, fig.height=6}
+
+df = read.csv("Data/MBT_ebird.csv")
+
+# Calculate the total number of species seen each month of each year, in each location 
+# I'm assuming the number of unique species? 
+df.mo = df %>% group_by(location, year, month) %>% 
+  summarise(number_of_species = length(unique(common_name)), .groups="drop")
+
+
+# Plot the number of species seen each month, with the colour of points indicating year, faceting by location 
+df.mo %>% 
+  ggplot(aes(month, number_of_species, colour=year)) + 
+  geom_hline(yintercept=0, colour="grey20") + 
+  geom_jitter(size=1.6, alpha=0.8, width=0.1) + 
+  theme_dark() + 
+  facet_wrap(~location) + 
+  scale_x_continuous(breaks=seq(1,12,1))+ 
+  scale_colour_viridis() + 
+  theme(panel.grid.major.y=element_blank(),
+        panel.grid.minor.y=element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.background = element_rect(fill="grey50") ,
+        text=element_text(size=15, face="bold", family="mono"),
+        axis.text.x = element_text(angle=315, hjust=0.5)) + 
+  labs(x="Month", y="Number of Unique Species Seen", title = "Unique Species by Location")
+
+
+## If save as svg, can edit with Inkscape if you want to!!! 
+## theme_set(theme_bw())
+
+```
+
+
+# Question 2 
+
+
+```{r question two, fig.width = 13, fig.height=7, warning=FALSE}
+
+df_samples = read.csv("Results/tidy_tibble.csv")
+df_mass = read.csv("Results/residual_mass_group.csv")
+
+# Plot comparison of mass by treatment including indiv obs, the mean and SE.  Use point colour or shape to indicate sex. 
+p1 = df_samples %>% 
+  filter(ID == "mass") %>% 
+  mutate(group=factor(group, levels=c("Control", "Treatment"))) %>% 
+  ggplot(aes(group, value)) + 
+  geom_point(aes(fill=sex), position=position_nudge(x=0.2),size=3.5,shape=21,colour="black", alpha=0.7) + 
+  stat_summary(geom="errorbar", size=2, width=0.2, colour="grey60") + 
+  stat_summary(fun = mean, geom = "point", size=3, shape=21, fill="grey60", colour="black", stroke=1.5) + 
+  theme_bw() + 
+  theme(panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(), 
+        # panel.background = element_rect(fill="black"),
+        #axis.text.x = element_text(angle=90, hjust=0.95,vjust=0.2),
+        legend.position = c(0.15,0.1), 
+        legend.box.background = element_rect(color="black"),
+        text=element_text(size=14, face="bold")) + 
+  labs(x="Group", y="Mass (kg?)", subtitle = "Mass by Group")
+# p1
+
+
+
+# Scatter plot of age and mass, indicate treatment with shape or colour, fit separate reg lines (no CI) to each treatment
+
+# missing some 
+p2 = df_samples %>% 
+  filter(ID %in% c("mass", "age")) %>% 
+  pivot_wider(id_cols=c(sample_name,group), names_from=ID, values_from=value) %>% 
+  ggplot(aes(age, mass, fill=group, colour=group)) + 
+  geom_point(shape=21, size=3, colour="black") + 
+  geom_smooth(method="lm", se=F) + 
+  scale_colour_manual(values=c("blue", "red2"), aesthetics=c("colour", "fill")) + 
+  theme_bw() + 
+  labs(x="Age (years)", y="Mass (kg)", subtitle = "Mass vs Age, by group" ) + 
+  theme(text=element_text(size=14, face="bold"), 
+        legend.position = c(0.2,0.1), 
+        legend.box.background = element_rect(color="black"))
+# p2
+
+# Combine plots, tag each panel with a number or letter, include a title 
+p1 + p2 + plot_annotation(title = "Mass by Group and Age", 
+                          theme = theme(plot.title = element_text(size=25, face="bold", family="serif", colour="grey30")), 
+                          tag_levels = "A")
+
+```
+
+
+
+
+
+
+
+
