@@ -59,7 +59,7 @@ Date            Description      Link
 TBD (Assn 3)    Text editing     TBD
 10-02-22        Wrangling        [Assignment 4](Assignments/Adamic_Assignment4.html)
 10-02-22        Tidying          [Assignment 5](Assignments/Adamic_Assignment5.html)
-
+10-13-22        Ggplotting       [Assignment 6](Assignments/Adamic_Assignment6.html)
 
 
 
