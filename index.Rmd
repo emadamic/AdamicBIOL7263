@@ -47,6 +47,20 @@ Internal signals regarding the state of the body constantly emanate to the centr
 ![*Figure 1. Identifying what subregions of the insular cortex receive bottom-up signals that are then accessible to top-down attention towards and conscoius awareness of the body, in both healthy comparisons (HC) and a sample of anxieyt, depression, and eating disorder patients (ADE).*](Fig2.jpg){width=40%}
 
 
+# My Lesson
+
+Link to the lesson: 
+
+[Fun with For loops!](MyLesson/LoopLesson.html)
+
+Links to the data: 
+
+```{r, echo=F}
+xfun::embed_dir('MyLesson/heart_rate_data', text = 'Download heart rate data')
+
+xfun::embed_file('MyLesson/trial_dose_reference.csv', text = "Download reference csv")
+```
+
 
 
 
