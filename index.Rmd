@@ -61,21 +61,24 @@ xfun::embed_dir('MyLesson/heart_rate_data', text = 'Download heart rate data')
 xfun::embed_file('MyLesson/trial_dose_reference.csv', text = "Download reference csv")
 ```
 
-
+\
 
 
 # Assignments 
 ___
 
-Date            Description      Link   
--------------   -------------    ------------- 
-09/01/22        Hello world      [Assignment 1](Assignments/Adamic_Assignment1.html)
-TBD (Assn 3)    Text editing     TBD
-10-02-22        Wrangling        [Assignment 4](Assignments/Adamic_Assignment4.html)
-10-02-22        Tidying          [Assignment 5](Assignments/Adamic_Assignment5.html)
-10-13-22        Ggplotting       [Assignment 6](Assignments/Adamic_Assignment6.html)
-
-
+Date            Description         Link   
+-------------   -------------       ------------- 
+09-01-22        Hello world         [Assignment 1](Assignments/Adamic_Assignment1.html)
+09-08-22        Make index          No link, this webpage is the proof.
+10-02-22        Text editing        [Assignment 3](Assignments/Adamic_Assignment3.html)
+10-02-22        Wrangling           [Assignment 4](Assignments/Adamic_Assignment4.html)
+10-02-22        Tidying             [Assignment 5](Assignments/Adamic_Assignment5.html)
+10-13-22        Ggplotting          [Assignment 6](Assignments/Adamic_Assignment6.html)
+12-01-22        GIS                 [Assignment 7](Assignments/Adamic_Assignment7.html)
+12-01-22        Madison Assignment  [Assignment 8: Heatmaps](Assignments/Adamic_MadisonHeatmapAssignment.html)
+12-01-22        Cari Assignment     [Assignment 9: Building functions](Assignments/Adamic_CariFunctionAssignment.html)
+12-01-22        Bekah Assignment    [Assignment 10: Geomorph](Assignments/Adamic_BekahProcrustusAssignment.html)
 
 
 

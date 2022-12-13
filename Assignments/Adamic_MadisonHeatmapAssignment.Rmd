@@ -1,0 +1,48 @@
+---
+title: "Madison HeatMap Assignment"
+author: "Emily Adamic"
+date: "2022-12-01"
+output: 
+  rmarkdown::html_document:
+    code_folding: show
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Assignment Description: 
+
+Take the following dataset and create a heatmap using ggplot2 that is faceted by tissue type. Customize the heatmap and make sure all the axis labels/titles are correct and that you can read them all. Make sure to add a plot title. Feel free to customize the color and whatever else you see fit. Create an R Markdown file with a link to your script as well as an imbedded image of your heatmap.
+
+> Note: I have chosen to just do all the assignment in R Markdown, without linking to an external script. I have included the code chunk in the collapsible menu. I wasn't sure the units for expression, so I just put au. 
+
+```{r load libs and data, include=FALSE}
+library(tidyverse)
+df = read.csv("Data/MAH_assignment_data.csv")
+```
+
+```{r make heatmap, fig.width=10, fig.height=6}
+df %>% ggplot(aes(Sample, Gene, fill=Expression)) + 
+  geom_tile(color="black", size=0.7) + 
+  facet_grid(~Tissue, scales="free_x", space="free_x") + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=270, hjust = 0, family="mono"),
+        axis.text.y = element_text(family="mono"),
+        text = element_text(face="bold"), 
+        strip.placement = "outside", 
+        plot.title = element_text(hjust=0.5)) + 
+  scale_x_discrete(labels=c('A.tri', 'D.brim', 'E.tyn M', 'E.tyn P', 'P.alb', 'R.kez', 
+                            'A.tri', 'D.brim', 'E.tyn M', 'E.tyn P', 'P.alb', 'R.kez',
+                            'A.tri', 'D.brim', 'E.tyn M', 'E.tyn P', 'P.alb', 'R.kez',
+                            'A.tri', 'D.brim', 'E.tyn M', 'E.tyn P', 'P.alb', 'R.kez')) + 
+  scale_fill_gradient(low = "black", high = "lime green", name="Expression (au)") + 
+  labs(x="", y="Gene", title = "Gene Expression Across Tissues")
+
+```
+
+
+
+
+

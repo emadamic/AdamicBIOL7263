@@ -1,0 +1,179 @@
+---
+title: "GIS Lesson"
+author: "Emily Adamic"
+date: "10/20/2022"
+output: 
+  rmarkdown::html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    theme: sandstone
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load libraries}
+library(sp) # classes for vector data (polygons, points, lines)
+library(rgeos) # methods for vector files
+library(geosphere) # more methods for vector files
+library(dismo) # species distribution modeling tools
+library(rgdal) # basic operations for spatial data.
+library(raster) # handles rasters
+```
+
+- Rasters are just matrices of points, so you can do stuff with them! Math, etc. 
+
+
+```{r}
+bio1<- raster("WORLDCLIM_Rasters/wc2.1_10m_bio_1.tif") # class = RasterLayer 
+plot(bio1 * 9/5 + 32) # do operations on raster: i.e., turn to F 
+```
+
+```{r make my own climate stack }
+clim_stack = stack(list.files("WORLDCLIM_Rasters", full.names=TRUE, pattern="tif"))
+# stack is a raster thing... RasterStack: a collection of RasterLayer objects with the same spatial extent and resolution. 
+
+
+# make a stack of subset of all these rasters... 
+my_clim_stack = stack(  raster("WORLDCLIM_Rasters/wc2.1_10m_bio_1.tif"), # mean temp 
+                        raster("WORLDCLIM_Rasters/wc2.1_10m_bio_2.tif"), # dirunal range in temp 
+                        raster("WORLDCLIM_Rasters/wc2.1_10m_bio_12.tif")  # precipitation
+                        )
+
+names(my_clim_stack) = c("MeanTemp", "DiurnalRangeTemp", "Precip")
+
+plot(my_clim_stack)
+pairs(my_clim_stack)
+```
+
+
+```{r load country shape files}
+# Political country boundaries to layer this on top of the plot and help us interpret the world 
+countries = shapefile("Country_Shapefiles/ne_10m_admin_0_countries.shp")
+countries
+
+plot(countries, col="goldenrod", border="darkblue")
+# dev.new()
+plot.new() # have to run the 
+plot(my_clim_stack[[1]])
+# plot(countries, add=TRUE)
+my_sites <- as.data.frame(click(n=10)) # I don't think this worlds in R markdown 
+names(my_sites) <- c('longitude', 'latitude')
+
+env <- as.data.frame(extract(my_clim_stack, my_sites)) # extract values from Raster objects 
+# so I think will extract the values at each pixel 
+
+my_sites <- cbind(my_sites, env)
+
+myCrs <- projection(my_clim_stack) # get projection info
+
+# make into points file
+my_sites_shape <- SpatialPointsDataFrame(coords=my_sites, data=my_sites, proj4string=CRS(myCrs))
+# doesn't work with NA's in the file 
+
+plot(my_clim_stack[[2]])
+plot(countries, add=TRUE)
+points(my_sites_shape, pch=16) # show sites on the map
+
+writeOGR(mySitesShape, 'My_locations', 'my_sites_shape', driver='ESRI Shapefile')
+
+```
+
+
+# Fitting of model of predicted locations, based on previous locations (ones I've already clicked)
+
+```{r}
+bg <- as.data.frame(randomPoints(my_clim_stack, n=10000)) # 10,000 random sites
+names(bg) <- c('longitude', 'latitude')
+
+# Plot the random dots on a map. 
+plot.new()
+plot(my_clim_stack[[1]])
+points(bg, pch='.') # plot on map
+
+
+# extract variables (i.e. Temp) from the raster for the random points 
+bgEnv <- as.data.frame(extract(my_clim_stack, bg))
+bg <- cbind(bg, bgEnv) # add cols to the end of bg 
+
+# create a variable of 1's and 0's based on my sites or the random ones 
+
+pres_bg <- c(rep(1, nrow(my_sites)), rep(0, nrow(bg)))
+# so it's a 1 where I clicked "where I've been", and a 0 if not... and we train a model to predict based on the 1's, what is the likelihood I will be there. 
+train_data <- data.frame(
+    pres_bg=pres_bg,
+    rbind(my_sites, bg) )
+
+names(train_data)
+
+# BUILD THE MODEL 
+my_model <- glm(
+    pres_bg ~ 
+      MeanTemp*DiurnalRangeTemp*Precip + 
+      I(MeanTemp^2) + I(DiurnalRangeTemp^2) + I(Precip^2),
+    data=train_data,
+    family='binomial',
+    weights=c( rep(1, nrow(my_sites)) , rep( nrow(my_sites) / nrow(bg), nrow(bg)))
+)  
+# So sum of weights is equal betwen our ponits and random ponits, otherwise the sheer number of random poitns iwll outweigh.....
+
+# summary(my_model)
+
+
+my_world <- predict(
+  my_clim_stack,
+  my_model,
+  type='response'
+)
+
+my_world
+plot.new()
+plot(my_world)
+points(my_sites_shape, col='magenta', pch=16)
+
+writeRaster(my_world, "My_Climate_Space/my_world.tif", format="GTiff", overwrite=T, progress="text")
+```
+
+
+```{r}
+# filter out prob of regions below 75% prob
+my_world_threshold = my_world >= quantile(my_world, 0.75) # everything above will be 1 (i.e. returns "TRUE" for the >=) so this serves as a "mask", we can threshold all these points. 
+
+plot(my_world_threshold) 
+
+# convert all values not equal to 1, to NA's... 
+my_world_threshold = calc(my_world_threshold, fun=function(x) ifelse(x!=1 | is.na(x), NA, 1))
+
+my_best_sites <- randomPoints(my_world_threshold, 10000)
+my_best_env <- as.data.frame(extract(my_clim_stack, my_best_sites))
+
+smoothScatter(x=bgEnv$MeanTemp, y=bgEnv$Precip, col='lightblue')
+points(my_best_env$MeanTemp, my_best_env$Precip, col='red', pch=16, cex=0.2)
+points(my_sites$MeanTemp, my_sites$Precip, pch=16)
+legend(
+  'topleft',
+  inset=0.01,
+  legend=c('world', 'my niche', 'my locations'),
+  pch=16,
+  col=c('lightblue', 'red', 'black'),
+  pt.cex=c(1, 0.4, 1)
+  
+)
+
+? smoothScatter
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

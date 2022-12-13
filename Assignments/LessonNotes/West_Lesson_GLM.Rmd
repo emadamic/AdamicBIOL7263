@@ -1,0 +1,116 @@
+---
+title: "Amy Pres: GLM Selection with MuMin and AICcmodavg"
+author: "Emily Adamic"
+date: "2022-11-03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+
+library(MuMIn)
+#Stands for Multi-Model Inference
+#Calculates AICc scores
+#Automated model generation
+
+library(AICcmodavg)
+#stands for AICc model averaging
+#Does other things, but we will primarily use it to make pretty AIC tables :D 
+```
+
+
+```{r}
+banding = read.csv("/Users/eadamic/Desktop/SD_banding_data.csv")
+```
+
+```{r}
+
+```
+
+
+Make a GLM: 
+```{r}
+glm_example <- glm( mass ~ tarsus + wing, data=banding, family=gaussian )
+summary(glm_example)
+
+# lm is the same if family is gaussian 
+lm_example <- lm( mass ~ tarsus + wing, data=banding )
+summary(lm_example)
+
+anova(glm_example, test = "F")
+
+
+```
+
+
+Make a big boy mass model. 
+
+```{r}
+
+banding_na = na.omit(banding)
+mass.model <- glm(mass ~ tarsus * wing + fat + species, 
+                  data = banding_na, family=gaussian, na.action = na.fail)
+summary(mass.model)
+anova(mass.model, test="F")
+
+
+## Now we do the AICc_models to compare 
+
+AICc_models <- dredge(mass.model, rank="AICc", fixed="species")
+
+# make a list of models from this dredge list 
+model_list <- get.models(AICc_models, subset=1:5) # take the first 5 
+# this is a LIST stored by row num 
+model_list
+
+## Now we turn this into a prettier output using the other package 
+madavg_table <- aictab(model_list, second.ord = TRUE, # second.ord = AICc scores rather than AIC uncorrected
+                       sort=TRUE)   # sort will make lowest AIC up to highest
+
+
+model_name_list = NULL
+for (i in 1:5){
+  model_name_list = c(model_name_list, as.character(model_list[[i]][['formula']]))
+}
+
+```
+
+
+
+
+
+```{r}
+data(iris)
+iris.long = iris %>% melt(id=c("Species"))
+corrplot::corrplot(round(cor(iris[,1:4]), 2))
+
+iris_pca <- prcomp( iris[,1:4], 
+                    center=TRUE, scale=TRUE, cor=TRUE, scores=TRUE)
+
+summary(iris_pca)
+plot(iris_pca)
+
+iris_pca$rotation
+
+
+library(ggfortify)
+autoplot(iris_pca, data=iris, colour="Species") + 
+  theme_bw() # plots first two component automatically 
+
+plot(iris_pca, type="l") # scree 
+
+
+```
+
+
+
+
+
+
+
+

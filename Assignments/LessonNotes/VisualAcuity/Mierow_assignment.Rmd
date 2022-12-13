@@ -1,0 +1,24 @@
+---
+title: "Mierow Assignment"
+author: "Emily Adamic"
+date: "10/27/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Giraffe viewing sub-saharan Africa 
+
+
+# Dog viewing a family 
+
+
+# Cat viewing a family 
+
+
+# Acouti paca viewing the rainforest 
+
+
+# 

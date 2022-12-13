@@ -1,0 +1,123 @@
+---
+title: "Cari Assignment on Building Functions"
+author: "Emily Adamic"
+date: "2022-12-01"
+output: 
+  rmarkdown::html_document:
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question 1
+
+Using the ebird dataset from previous lessons, write a function that will take the scientific name as input and create a new file containing all the observation info for that bird. Name the output files with the scientific names for the following species:
+
+```{r, include=FALSE}
+library(tidyverse)
+```
+
+```{r}
+df = read.csv("Data/MBT_ebird.csv")
+```
+
+```{r}
+
+q1_func <- function(sci_name, df){
+  df_output = filter(df, scientific_name == sci_name)
+  csv_output = paste0("Results/",sci_name, "_output.csv")
+  write.csv(df_output, csv_output)
+  cat("\nFile:", csv_output, "created")
+}
+
+q1_func("Anser caerulescens", df)
+q1_func("Antrostomus carolinensis", df)
+q1_func("Setophaga americana", df)
+
+```
+
+
+[ANSER CAERULESCENS LINK HERE](Results/Anser caerulescens_output.csv)
+
+[ANTROSTOMUS CAROLINENSIS LINK HERE](Results/Antrostomus carolinensis_output.csv)
+
+[SETOPHAGA AMERICANA LINK HERE](Results/Setophaga americana_output.csv)
+
+# Question 2
+
+Using the ebird dataset from previous lessons, write a function that will take the scientific name as input and create a new file containing all the observation info for that bird. Name the output files with the scientific names for the following species.
+
+**Note:** I have built a function off of the column "count", assuming these represent the individaul days that the birds were observed the most and the least? This results in a lot more rows per bird than the example (i.e. there were many days when that bird was observed only once)... but I may not understand the question perfectly, however. 
+
+```{r}
+
+# "Anser caerulescens"
+# Antrostomus carolinensis
+# Setophaga americana
+
+q2_func <- function(sci_name) {
+  
+  csv_name = paste0("Results/", sci_name, "_output.csv")
+  
+  df = read.csv(csv_name)
+  min_num = min(df$count)
+  max_num = max(df$count)
+  
+  output_df = filter(df, count %in% c(min_num, max_num))
+
+}
+
+all_three_df = bind_rows(q2_func("Anser caerulescens"), q2_func("Antrostomus carolinensis"), q2_func("Setophaga americana"))
+
+write.csv(all_three_df, "Results/q2_function_maxmin_output.csv")
+
+```
+
+[FILE LINK HERE](Results/q2_function_maxmin_output.csv)
+
+# Question 3 
+
+Write a nested function that will complete Problems 1 and 2 in a single function, but with the following species names as argument values.
+
+```{r}
+df = read.csv("Data/MBT_ebird.csv")
+
+sci_names = c("Branta canadensis","Spatula discors", "Anas platyrhynchos")
+
+q3_func = function(sci_names){
+  
+  # run q1 function on all three 
+  for(s in sci_names){
+    cat("\n", s)
+    q1_func(s, df)
+  }
+
+  # run q2 func on all three to get the min max for each. 
+  all_three_df = bind_rows(q2_func(sci_names[1]), 
+                           q2_func(sci_names[2]), 
+                           q2_func(sci_names[3]))
+  
+  write.csv(all_three_df, "Results/q3_allthree_output.csv")
+  
+  cat("\n\nSaved min and max observations for all in sci_names.")
+  
+}
+
+q3_func(sci_names)
+
+```
+
+
+[LINK TO BRANTA CANADENSIS](Results/Branta canadensis_output.csv)
+
+[LINK TO SPATULA DISCORS](Results/Spatula discors_output.csv)
+
+[LINK TO ANAS PLATYRHYNCHOS](Results/Anas platyrhynchos_output.csv)
+
+[LINK TO ALL THREE MIN AND MAX FILE](Results/q3_allthree_output.csv)
+
+
+
+

@@ -1,0 +1,42 @@
+---
+title: "GitNotes"
+author: "Emily Adamic"
+date: "9/1/2022"
+output: html_document
+---
+
+Repo: the collection of files + git files
+
+Github: website for archiving your repo
+    - can clone anyone's public to your local computer, but cannot upload
+    
+A commit (noun, or verb): a snapshot in time where you tell git to record your changes
+    - only records *changes*, not full versions - can render the previously commited doc based on changes.
+    
+LOCALLY ON GIT:
+ make changes just to A -- and commit --> A'
+ A --> A'--> A'
+ B --> B --> x delete
+ C --> C --> C
+             D
+so, could go back and check out that doc B that was in the previous commit
+
+----------> then every so often can PUSH: to GITHUB, or PULL: from GITHUB
+
+can also make a BRANCH: and make commits on a branch vs. the main line
+  - could kill the fork if it didn't work, or could merge it back with main branch if you wanted...doing work without messing up your main code (without having to just go backwards in versions if you mess up) so could be many forks that you could reconcile
+
+
+From github website:
+echo "# BIOL7263_Repo" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/emadamic/BIOL7263_Repo.git
+git push -u origin main
+
+MUST call the main page: index.html in order to create a website on github...
+
+# My personal token!!!!!
+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

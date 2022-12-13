@@ -1,0 +1,42 @@
+---
+title: "Assignment 7"
+author: "Emily Adamic"
+date: "10/13/22"
+output: 
+  rmarkdown::html_document:
+    code_folding: hide
+    toc: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question 1
+
+Present a map of your climate niche with your selected locations highlighted.
+
+![](LessonNotes/GIS_Lesson/MyWorld_ModelPredictions.png)
+
+
+# Question 2 
+
+Present a scatter plot of two of your selected variables for the world as a whole, your climate niche, and your selected points.
+
+![](LessonNotes/GIS_Lesson/my_niche_scatter.tif)
+
+
+# Question 3 
+
+[Link to script](LessonNotes/GIS_Lesson/GIS_lesson.Rmd)
+
+
+
+
+
+
+
+
+
+
+
